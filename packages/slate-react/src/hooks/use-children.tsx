@@ -11,6 +11,7 @@ import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
+  RenderTextProps,
 } from '../components/editable'
 import { SelectedContext } from './use-selected'
 
@@ -22,6 +23,7 @@ const useChildren = (props: {
   decorations: Range[]
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
@@ -31,6 +33,7 @@ const useChildren = (props: {
     node,
     renderElement,
     renderPlaceholder,
+    renderText,
     renderLeaf,
     selection,
   } = props
@@ -67,6 +70,7 @@ const useChildren = (props: {
             element={n}
             key={key.id}
             renderElement={renderElement}
+            renderText={renderText}
             renderPlaceholder={renderPlaceholder}
             renderLeaf={renderLeaf}
             selection={sel}
@@ -81,6 +85,7 @@ const useChildren = (props: {
           isLast={isLeafBlock && i === node.children.length - 1}
           parent={node}
           renderPlaceholder={renderPlaceholder}
+          renderText={renderText}
           renderLeaf={renderLeaf}
           text={n}
         />

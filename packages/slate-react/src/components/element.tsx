@@ -17,6 +17,7 @@ import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
+  RenderTextProps,
 } from './editable'
 
 /**
@@ -27,6 +28,7 @@ const Element = (props: {
   decorations: Range[]
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
@@ -35,6 +37,7 @@ const Element = (props: {
     decorations,
     element,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
+    renderText,
     renderPlaceholder,
     renderLeaf,
     selection,
@@ -62,6 +65,7 @@ const Element = (props: {
     decorations,
     node: element,
     renderElement,
+    renderText,
     renderPlaceholder,
     renderLeaf,
     selection,
@@ -138,6 +142,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
+    prev.renderText === next.renderText &&
     prev.renderLeaf === next.renderLeaf &&
     prev.renderPlaceholder === next.renderPlaceholder &&
     isElementDecorationsEqual(prev.decorations, next.decorations) &&

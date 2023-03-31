@@ -105,6 +105,15 @@ export interface RenderLeafProps {
   }
 }
 
+export interface RenderTextProps {
+  children: any
+  callback: (span: HTMLSpanElement | null) => void
+  attributes: {
+    'data-slate-node': 'text'
+  }
+  text: Text
+}
+
 /**
  * `EditableProps` are passed to the `<Editable>` component.
  */
@@ -117,6 +126,7 @@ export type EditableProps = {
   role?: string
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
@@ -140,6 +150,7 @@ export const Editable = (props: EditableProps) => {
     placeholder,
     readOnly = false,
     renderElement,
+    renderText,
     renderLeaf,
     renderPlaceholder = defaultRenderPlaceholder,
     scrollSelectionIntoView = defaultScrollSelectionIntoView,
@@ -1687,6 +1698,7 @@ export const Editable = (props: EditableProps) => {
               decorations={decorations}
               node={editor}
               renderElement={renderElement}
+              renderText={renderText}
               renderPlaceholder={renderPlaceholder}
               renderLeaf={renderLeaf}
               selection={editor.selection}

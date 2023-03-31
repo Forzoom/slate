@@ -8,8 +8,13 @@ import {
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
 } from '../utils/weak-maps'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import { RenderLeafProps, RenderPlaceholderProps, RenderTextProps } from './editable'
 import Leaf from './leaf'
+
+export const DefaultText = (props: RenderTextProps) => {
+  const { attributes, callback, children } = props
+  return <span {...attributes} ref={callback}>{children}</span>
+}
 
 /**
  * Text.
@@ -20,6 +25,7 @@ const Text = (props: {
   isLast: boolean
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: SlateText
 }) => {
@@ -28,6 +34,7 @@ const Text = (props: {
     isLast,
     parent,
     renderPlaceholder,
+    renderText = (props: RenderTextProps) => <DefaultText {...props} />,
     renderLeaf,
     text,
   } = props
@@ -72,11 +79,19 @@ const Text = (props: {
     },
     [ref, editor, key, text]
   )
-  return (
-    <span data-slate-node="text" ref={callbackRef}>
-      {children}
-    </span>
-  )
+
+  const attributes: {
+    'data-slate-node': 'text';
+  } = {
+    'data-slate-node': 'text',
+  };
+
+  return renderText({
+    attributes,
+    callback: callbackRef,
+    children,
+    text,
+  });
 }
 
 const MemoizedText = React.memo(Text, (prev, next) => {
@@ -84,6 +99,7 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
+    next.renderText === prev.renderText &&
     next.renderPlaceholder === prev.renderPlaceholder &&
     next.text === prev.text &&
     isTextDecorationsEqual(next.decorations, prev.decorations)
