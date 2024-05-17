@@ -360,9 +360,11 @@ export const Editor: EditorInterface = {
       return
     }
 
+    // 获取 path
     const path = Editor.path(editor, at)
     const reverse = mode === 'lowest'
 
+    // 按照一定的顺序进行遍历
     for (const [n, p] of Editor.levels(editor, {
       at: path,
       voids,
@@ -610,6 +612,7 @@ export const Editor: EditorInterface = {
    */
 
   insertText(editor: Editor, text: string): void {
+    // console.log('target71-6', editor.insertText);
     editor.insertText(text)
   },
 
@@ -1134,6 +1137,7 @@ export const Editor: EditorInterface = {
       }
     }
 
+    // Range 也有?
     if (Range.isRange(at)) {
       if (edge === 'start') {
         at = Range.start(at)

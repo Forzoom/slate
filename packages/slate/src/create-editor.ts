@@ -31,6 +31,8 @@ export const createEditor = (): Editor => {
     onChange: () => {},
 
     apply: (op: Operation) => {
+      // console.log('target71-13');
+      // 对于三种 ref 进行处理
       for (const ref of Editor.pathRefs(editor)) {
         PathRef.transform(ref, op)
       }
@@ -76,14 +78,16 @@ export const createEditor = (): Editor => {
         add(path)
       }
 
+      // 更新了 dirty_path 数据
       DIRTY_PATHS.set(editor, dirtyPaths)
       DIRTY_PATH_KEYS.set(editor, dirtyPathKeys)
+      // 应用 transform
       Transforms.transform(editor, op)
+      // console.log('target71-14');
       editor.operations.push(op)
       Editor.normalize(editor, {
         operation: op,
       })
-
       // Clear any formats applied to the cursor if the selection changes.
       if (op.type === 'set_selection') {
         editor.marks = null
@@ -196,12 +200,14 @@ export const createEditor = (): Editor => {
 
     insertText: (text: string) => {
       const { selection, marks } = editor
-
+      // console.log('target71-9');
       if (selection) {
+        // console.log('target71-10');
         if (marks) {
           const node = { text, ...marks }
           Transforms.insertNodes(editor, node)
         } else {
+          // console.log('target71-11');
           Transforms.insertText(editor, text)
         }
 

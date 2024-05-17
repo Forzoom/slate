@@ -34,6 +34,7 @@ const useChildren = (props: {
     renderLeaf,
     selection,
   } = props
+  // console.log('target72', node);
   const decorate = useDecorate()
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)

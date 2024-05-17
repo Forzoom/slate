@@ -15,6 +15,7 @@ import { HistoryEditor } from './history-editor'
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   const { apply } = e
+  // 数据存储
   e.history = { undos: [], redos: [] }
 
   e.redo = () => {
@@ -66,6 +67,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
   }
 
+  // 应该就是 editor.apply 函数
   e.apply = (op: Operation) => {
     const { operations, history } = e
     const { undos } = history

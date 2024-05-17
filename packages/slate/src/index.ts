@@ -14,3 +14,6 @@ export * from './interfaces/range-ref'
 export * from './interfaces/scrubber'
 export * from './interfaces/text'
 export * from './transforms'
+
+// eslint-disable-next-line no-console
+console.log('target77 local slate')

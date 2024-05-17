@@ -302,6 +302,7 @@ export const Node: NodeInterface = {
       const [start, end] = Range.edges(range)
       const nodeEntries = Node.nodes(r, {
         reverse: true,
+        // 这里没有自定义的空间，所以会从最深到最浅，全部切出来
         pass: ([, path]) => !Range.includes(range, path),
       })
 
@@ -454,6 +455,7 @@ export const Node: NodeInterface = {
     path: Path,
     options: NodeLevelsOptions = {}
   ): Generator<NodeEntry, void, undefined> {
+    // 调用 path.levels，默认情况下是从最浅到最深
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
       yield [n, p]
@@ -480,7 +482,7 @@ export const Node: NodeInterface = {
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
    */
-
+  // 有点没看懂这里的顺序逻辑
   *nodes(
     root: Node,
     options: NodeNodesOptions = {}
@@ -505,6 +507,7 @@ export const Node: NodeInterface = {
         !visited.has(n) &&
         !Text.isText(n) &&
         n.children.length !== 0 &&
+        // 如果 pass
         (pass == null || pass([n, p]) === false)
       ) {
         visited.add(n)

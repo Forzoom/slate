@@ -266,6 +266,8 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       break
     }
 
+    // 不能对 split_node 直接进行修改，用来生成新节点的 id
+    // 因为那样的话，split_node op产生的结果就不稳定了
     case 'split_node': {
       const { path, position, properties } = op
 
@@ -280,6 +282,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const index = path[path.length - 1]
       let newNode: Descendant
 
+      // 不管是 text，还是 element ，都会被分开
       if (Text.isText(node)) {
         const before = node.text.slice(0, position)
         const after = node.text.slice(position)
@@ -299,6 +302,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
         }
       }
 
+      // 直接对数据进行了修改
       parent.children.splice(index + 1, 0, newNode)
 
       if (selection) {
@@ -320,12 +324,15 @@ export const GeneralTransforms: GeneralTransforms = {
    */
 
   transform(editor: Editor, op: Operation): void {
+    const old = editor.children
     editor.children = createDraft(editor.children)
+    // console.log('target73', editor.children === old);
     let selection = editor.selection && createDraft(editor.selection)
 
     try {
       selection = applyToDraft(editor, selection, op)
     } finally {
+      // console.log('target73-1');
       editor.children = finishDraft(editor.children)
 
       if (selection) {

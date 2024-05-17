@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom'
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { Editor, Node, Descendant, Scrubber } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
@@ -11,6 +12,9 @@ import {
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 import { IS_REACT_VERSION_17_OR_ABOVE } from '../utils/environment'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
+// console.log('target51', ReactDOM);
+// @ts-ignore
+window.React2 = React
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor

@@ -81,10 +81,12 @@ export const Range: RangeInterface = {
 
   /**
    * Check if a range includes a path, a point or part of another range.
+   * 有点不太确定，当只包含了部分的情况下，是否会是 includes?
    */
 
   includes(range: Range, target: Path | Point | Range): boolean {
     if (Range.isRange(target)) {
+      // 从这里看，只包含边界点的情况下，也算 includes
       if (
         Range.includes(range, target.anchor) ||
         Range.includes(range, target.focus)

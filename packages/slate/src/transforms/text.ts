@@ -62,16 +62,19 @@ export const TextTransforms: TextTransforms = {
       } = options
       let { at = editor.selection, hanging = false } = options
 
+      // 没有at就不处理
       if (!at) {
         return
       }
 
+      // 判断是否 collapsed
       let isCollapsed = false
       if (Range.isRange(at) && Range.isCollapsed(at)) {
         isCollapsed = true
         at = at.anchor
       }
 
+      // 非 collapse 不进入
       if (Point.isPoint(at)) {
         const furthestVoid = Editor.void(editor, { at, mode: 'highest' })
 
@@ -97,10 +100,12 @@ export const TextTransforms: TextTransforms = {
         return
       }
 
+      // hanging 默认是false，会进入这里处理
       if (!hanging) {
         const [, end] = Range.edges(at)
         const endOfDoc = Editor.end(editor, [])
 
+        // 这里是什么意思？
         if (!Point.equals(end, endOfDoc)) {
           at = Editor.unhangRange(editor, at, { voids })
         }
@@ -521,6 +526,7 @@ export const TextTransforms: TextTransforms = {
       }
 
       const { path, offset } = at
+      // console.log('target71-12');
       if (text.length > 0)
         editor.apply({ type: 'insert_text', path, offset, text })
     })

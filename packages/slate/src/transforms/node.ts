@@ -150,20 +150,24 @@ export const NodeTransforms: NodeTransforms = {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
 
+      // 处理成数组
       if (Node.isNode(nodes)) {
         nodes = [nodes]
       }
 
+      // 没有内容则不处理
       if (nodes.length === 0) {
         return
       }
 
+      // 为什么又需要第一个节点
       const [node] = nodes
 
       // By default, use the selection as the target location. But if there is
       // no selection, insert at the end of the document since that is such a
       // common use case when inserting from a non-selected state.
       if (!at) {
+        // 默认使用 selection，否则插入到最后
         if (editor.selection) {
           at = editor.selection
         } else if (editor.children.length > 0) {
@@ -172,6 +176,7 @@ export const NodeTransforms: NodeTransforms = {
           at = [0]
         }
 
+        // 不懂是做什么用的
         select = true
       }
 
@@ -189,12 +194,15 @@ export const NodeTransforms: NodeTransforms = {
         } else {
           const [, end] = Range.edges(at)
           const pointRef = Editor.pointRef(editor, end)
+          // 将范围内的内容删除
           Transforms.delete(editor, { at })
           at = pointRef.unref()!
         }
       }
 
+      // 在这里，基本已经是 point 了
       if (Point.isPoint(at)) {
+        // 给出默认的 match 函数
         if (match == null) {
           if (Text.isText(node)) {
             match = n => Text.isText(n)
@@ -205,6 +213,7 @@ export const NodeTransforms: NodeTransforms = {
           }
         }
 
+        // 找到现有位置上的内容
         const [entry] = Editor.nodes(editor, {
           at: at.path,
           match,
@@ -216,6 +225,7 @@ export const NodeTransforms: NodeTransforms = {
           const [, matchPath] = entry
           const pathRef = Editor.pathRef(editor, matchPath)
           const isAtEnd = Editor.isEnd(editor, at, matchPath)
+          // 如果正好在节点的交界处，分割节点是不是就没用了？
           Transforms.splitNodes(editor, { at, match, mode, voids })
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
@@ -227,6 +237,7 @@ export const NodeTransforms: NodeTransforms = {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
+      // 没懂这里的意思
       if (!voids && Editor.void(editor, { at: parentPath })) {
         return
       }
@@ -336,6 +347,7 @@ export const NodeTransforms: NodeTransforms = {
         return
       }
 
+      // 提供默认的 match 逻辑
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
@@ -698,6 +710,10 @@ export const NodeTransforms: NodeTransforms = {
       match?: NodeMatch<T>
       mode?: RangeMode
       always?: boolean
+      /**
+       * 是用来做什么的呢？
+       * 默认情况下是0
+       */
       height?: number
       voids?: boolean
     } = {}
@@ -710,6 +726,7 @@ export const NodeTransforms: NodeTransforms = {
         match = n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
+      // 删除掉 range 中的内容
       if (Range.isRange(at)) {
         at = deleteRange(editor, at)
       }
@@ -718,10 +735,13 @@ export const NodeTransforms: NodeTransforms = {
       // counters need to account for us potentially splitting at a non-leaf.
       if (Path.isPath(at)) {
         const path = at
+        // 获取 path start point
         const point = Editor.point(editor, path)
         const [parent] = Editor.parent(editor, path)
         match = n => n === parent
+        // 不是很明白
         height = point.path.length - path.length + 1
+        // at 变成了 point
         at = point
         always = true
       }
@@ -730,11 +750,13 @@ export const NodeTransforms: NodeTransforms = {
         return
       }
 
+      // 不是很确定这两个 pointRef 是用来做什么的
       const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
       let afterRef: PointRef | undefined
       try {
+        // 默认情况下 mode = lowest，所以只会拿到最低的节点，也就是 text 的直接上级 element
         const [highest] = Editor.nodes(editor, { at, match, mode, voids })
 
         if (!highest) {
@@ -744,6 +766,7 @@ export const NodeTransforms: NodeTransforms = {
         const voidMatch = Editor.void(editor, { at, mode: 'highest' })
         const nudge = 0
 
+        // 可以先不管 void 逻辑
         if (!voids && voidMatch) {
           const [voidNode, voidPath] = voidMatch
 
@@ -764,23 +787,32 @@ export const NodeTransforms: NodeTransforms = {
           const siblingHeight = at.path.length - voidPath.length
           height = siblingHeight + 1
           always = true
-        }
+        } // void 逻辑结束
 
         afterRef = Editor.pointRef(editor, at)
+        // 主要在于控制 highest 的位置，height = 0 表示从 text 开始分割，height = 1 表示从 text 上层的 element 开始分割
         const depth = at.path.length - height
         const [, highestPath] = highest
+        // 如果 height = 0的话，lowestPath 会和 highestPath 相同？
         const lowestPath = at.path.slice(0, depth)
+        // 如果 height == 0，那么就是在 Text 上，使用 at.offset 没问题
+        // 否则的话，使用 at.path[depth]，也没问题
         let position = height === 0 ? at.offset : at.path[depth] + nudge
 
+        // 看起来是会分割多个层级的逻辑？
         for (const [node, path] of Editor.levels(editor, {
           at: lowestPath,
+          // 比较特别的是，这里是 reverse 的
+          // 由于 levels 默认是从浅层到深层的，所以这里 reverse 后就是从深层到浅层，也就是从 lowest 到 highest 进行分割
           reverse: true,
           voids,
         })) {
           let split = false
 
           if (
+            // 如果当前比 highest 还要浅的话
             path.length < highestPath.length ||
+            // 或者直接就是 editor
             path.length === 0 ||
             (!voids && Element.isElement(node) && Editor.isVoid(editor, node))
           ) {
@@ -790,9 +822,12 @@ export const NodeTransforms: NodeTransforms = {
           const point = beforeRef.current!
           const isEnd = Editor.isEnd(editor, point, path)
 
+          // 没有 beforeRef 是什么情况？不可能没有 beforeRef 吧
+          //
           if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
             split = true
             const properties = Node.extractProps(node)
+            // 最后还是调用了 split_node op
             editor.apply({
               type: 'split_node',
               path,

@@ -482,7 +482,7 @@ export const Editable = (props: EditableProps) => {
         if (isCompositionChange && ReactEditor.isComposing(editor)) {
           return
         }
-
+        // console.log('target71');
         let native = false
         if (
           type === 'insertText' &&
@@ -548,7 +548,7 @@ export const Editable = (props: EditableProps) => {
             }
           }
         }
-
+        // console.log('target71-1');
         // COMPAT: For the deleting forward/backward input types we don't want
         // to change the selection because it is the range that will be deleted,
         // and those commands determine that for themselves.
@@ -599,7 +599,7 @@ export const Editable = (props: EditableProps) => {
           Editor.deleteFragment(editor, { direction })
           return
         }
-
+        // console.log('target71-2');
         switch (type) {
           case 'deleteByComposition':
           case 'deleteByCut':
@@ -670,6 +670,7 @@ export const Editable = (props: EditableProps) => {
           case 'insertFromYank':
           case 'insertReplacementText':
           case 'insertText': {
+            // console.log('target71-3');
             if (type === 'insertFromComposition') {
               // COMPAT: in Safari, `compositionend` is dispatched after the
               // `beforeinput` for "insertFromComposition". But if we wait for it
@@ -688,6 +689,7 @@ export const Editable = (props: EditableProps) => {
             if (data?.constructor.name === 'DataTransfer') {
               ReactEditor.insertData(editor, data)
             } else if (typeof data === 'string') {
+              // console.log('target71-4');
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
               if (native) {
@@ -695,6 +697,7 @@ export const Editable = (props: EditableProps) => {
                   Editor.insertText(editor, data)
                 )
               } else {
+                // console.log('target71-5');
                 Editor.insertText(editor, data)
               }
             }

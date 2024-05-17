@@ -335,6 +335,7 @@ export const withReact = <T extends BaseEditor>(
         onContextChange()
       }
 
+      // console.log('target72', onContextChange, e, options);
       onChange(options)
     })
   }
